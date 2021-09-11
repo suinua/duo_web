@@ -12,6 +12,7 @@ html {
 
 body {
     overflow: hidden;
+    margin-top: 10px;
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
 }
@@ -71,7 +72,6 @@ body {
     height: 10%;
     bottom: 0;
     background-color: rgba(219, 219, 219, 0.6);
-    border-radius: 1em;
     text-align: center;
 }
 
