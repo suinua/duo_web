@@ -104,7 +104,10 @@ class Audio {
   }
 
   void skipPrevious() {
-    if (_currentPhrase == 1) return;
+    if (_currentPhrase == 1 || _audioElement.currentTime > 1) {
+      _audioElement.currentTime = 0;
+      return;
+    }
 
     toPhrase(_currentPhrase - 1);
     if (nowPlaying) play();
@@ -122,10 +125,9 @@ class _BookImageController {
 class _ScriptContextController {
 
   static void update(Phrase phrase) {
-    var scriptEnElement = querySelector('.script-en') as DivElement;
-    var scriptJpElement = querySelector('.script-jp') as DivElement;
-
-    scriptEnElement.text = phrase.engText;
-    scriptJpElement.text = phrase.jpText;
+    querySelector('.script-en')?.text = phrase.engText;
+    querySelector('.script-jp')?.text = phrase.jpText;
+    querySelector('.section-number')?.text = 'Section ${phrase.sectionNumber}';
+    querySelector('.phrase-number')?.text = 'No ${phrase.phraseNumber}';
   }
 }

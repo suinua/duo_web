@@ -2892,6 +2892,9 @@
     set$_innerHtml$x: function(receiver, value) {
       return J.getInterceptor$x(receiver).set$_innerHtml(receiver, value);
     },
+    set$text$x: function(receiver, value) {
+      return J.getInterceptor$x(receiver).set$text(receiver, value);
+    },
     get$attributes$x: function(receiver) {
       return J.getInterceptor$x(receiver).get$attributes(receiver);
     },
@@ -9061,7 +9064,7 @@
       return receiver[H._asInt(index)];
     }
   };
-  W.DivElement.prototype = {$isDivElement: 1};
+  W.DivElement.prototype = {};
   W.Document.prototype = {$isDocument: 1};
   W.DomException.prototype = {
     toString$0: function(receiver) {
@@ -11166,18 +11169,26 @@
       }
     },
     toPhrase$1: function(phraseNumber) {
-      var t1, t2, scriptEnElement, scriptJpElement, _this = this,
-        phrase = _this._script.getScriptContext$1$phraseNumber(phraseNumber);
-      _this._currentPhrase = phrase.phraseNumber;
+      var t2, t3, _this = this,
+        phrase = _this._script.getScriptContext$1$phraseNumber(phraseNumber),
+        t1 = phrase.phraseNumber;
+      _this._currentPhrase = t1;
       _this.get$_audioElement().currentTime = 0;
-      t1 = _this._currentPhrase;
-      t2 = document;
-      C.ImageElement_methods.set$srcset(type$.ImageElement._as(t2.querySelector("#book-screen")), "resources/images/" + t1 + ".png");
-      t1 = type$.DivElement;
-      scriptEnElement = t1._as(t2.querySelector(".script-en"));
-      scriptJpElement = t1._as(t2.querySelector(".script-jp"));
-      C.DivElement_methods.set$text(scriptEnElement, phrase.engText);
-      C.DivElement_methods.set$text(scriptJpElement, phrase.jpText);
+      t2 = _this._currentPhrase;
+      t3 = document;
+      C.ImageElement_methods.set$srcset(type$.ImageElement._as(t3.querySelector("#book-screen")), "resources/images/" + t2 + ".png");
+      t2 = t3.querySelector(".script-en");
+      if (t2 != null)
+        J.set$text$x(t2, phrase.engText);
+      t2 = t3.querySelector(".script-jp");
+      if (t2 != null)
+        J.set$text$x(t2, phrase.jpText);
+      t2 = t3.querySelector(".section-number");
+      if (t2 != null)
+        J.set$text$x(t2, "Section " + phrase.sectionNumber);
+      t2 = t3.querySelector(".phrase-number");
+      if (t2 != null)
+        J.set$text$x(t2, "No " + t1);
     },
     play$1$time: function(_, time) {
       var _this = this;
@@ -11190,11 +11201,12 @@
       return this.play$1$time($receiver, 0);
     },
     skipPrevious$0: function() {
-      var _this = this,
-        t1 = _this._currentPhrase;
-      if (t1 === 1)
+      var _this = this;
+      if (_this._currentPhrase === 1 || _this.get$_audioElement().currentTime > 1) {
+        _this.get$_audioElement().currentTime = 0;
         return;
-      _this.toPhrase$1(t1 - 1);
+      }
+      _this.toPhrase$1(_this._currentPhrase - 1);
       if (_this.nowPlaying)
         _this.play$0(0);
     }
@@ -11698,7 +11710,6 @@
       BaseElement: findType("BaseElement"),
       BodyElement: findType("BodyElement"),
       CssRule: findType("CssRule"),
-      DivElement: findType("DivElement"),
       Document: findType("Document"),
       Element: findType("Element"),
       Error: findType("Error"),
