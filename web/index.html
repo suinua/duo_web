@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>duo_web</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase.js"></script>
+</head>
+
+<body>
+
+
+<div class="wrap">
+    <div class="image-wrap">
+        <img id="book-screen" src="resources/images/1.png" alt="英語">
+        <div class="show-hidden-image"><span class="material-icons">arrow_back_ios_new</span></div>
+    </div>
+
+    <div class="script-play-bar-wrap">
+        <div class="script">
+            <div style="height: 20%"></div>
+            <div class="script-context">
+                <div class="script-en">We must respect the will of the individual.We must respect the will of the
+                    individual.
+                </div>
+            </div>
+            <div style="margin-top: 10%"></div>
+            <div class="script-context">
+                <div class="script-jp">個人の意志は尊重しなければいけない。</div>
+            </div>
+        </div>
+
+        <div class="play-bar">
+            <div class="seekbar">
+                <div class="seekbar-gauge"></div>
+            </div>
+            <a class="skip-pre-button">
+                <span class="material-icons">skip_previous</span>
+            </a>
+            <a class="play-button">
+                <span class="material-icons">play_arrow</span>
+            </a>
+            <a class="skip-next-button">
+                <span class="material-icons">skip_next</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="section-selector">
+    </div>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
