@@ -22,13 +22,12 @@ class Script {
 
     var json = jsonDecode(request.response);
     json.forEach((sectionNumber, sections) {
-
       sections.forEach((phraseNumber, phrase) {
         var jp = phrase['jp'].replaceFirst(RegExp('^[0-9]* *'), '');
         var en = phrase['en'].replaceFirst(RegExp('^[0-9]* *'), '');
 
-        _phraseList.add(Phrase(int.parse(sectionNumber),
-            int.parse(phraseNumber), jp, en));
+        _phraseList.add(
+            Phrase(int.parse(sectionNumber), int.parse(phraseNumber), jp, en));
       });
     });
   }
@@ -69,16 +68,34 @@ class Script {
     for (var section = 1; section < 46; section++) {
       var list = findPhrasesBySectionNumber(section);
 
-      var sectionItem = DivElement()
+      //セクション表示ボタン
+      var sectionSelectButton = DivElement()
         ..text = section.toString()
-        ..className = 'section-item';
-      var sectionSelectorElement = querySelector('.section-selector');
-      sectionSelectorElement?.children.add(sectionItem);
+        ..id = 'not-selected-button'
+        ..className = 'section-select-button';
 
+      var sectionSelectorButtonListElement = querySelector('.section-selector-button-list');
+      sectionSelectorButtonListElement?.children.add(sectionSelectButton);
+
+      //そのセクションのフレーズリスト
+      var phraseListWrap = DivElement()..className = 'phrase-list-wrap-hidden';
+
+      //セクション表示ボタンでフレーズリストの表示、非表示
+      sectionSelectButton.onClick.listen((event) {
+        querySelectorAll('.phrase-list-wrap').forEach((e) {
+          print(e.className);
+          e.className = 'phrase-list-wrap-hidden';
+        });
+        phraseListWrap.className = 'phrase-list-wrap';
+
+        querySelectorAll('#selected-button').forEach((e) {
+          e.id = 'not-selected-button';
+        });
+        sectionSelectButton.id = 'selected-button';
+      });
       for (var index = 0; index < list.length; index++) {
         var phrase = list[index];
-        var phraseElement = DivElement()
-          ..className = 'phrase-hidden'; //phrase or phrase-hidden
+        var phraseElement = DivElement()..className = 'phrase';
         var phraseSelectButton = DivElement()
           ..className = 'phrase-select'
           ..innerHtml = '<span class="material-icons">west</span>';
@@ -86,20 +103,16 @@ class Script {
           ..className = 'phrase-context'
           ..text = phrase.engText;
 
-        sectionItem.onClick.listen((event) {
-          phraseElement.className =
-              phraseElement.className == 'phrase' ? 'phrase-hidden' : 'phrase';
-        });
-
         phraseSelectButton.onClick.listen((event) {
           audio.toPhrase(phrase.phraseNumber);
         });
 
         phraseElement.children.add(phraseSelectButton);
         phraseElement.children.add(phraseContextElement);
+        phraseListWrap.children.add(phraseElement);
 
-        var sectionSelectorElement = querySelector('.section-selector');
-        sectionSelectorElement?.children.add(phraseElement);
+        var sectionItemList = querySelector('.phrase-list');
+        sectionItemList?.children.add(phraseListWrap);
       }
     }
   }

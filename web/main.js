@@ -1641,6 +1641,12 @@
     _failedAsCheck: function(object, testRti) {
       throw H.wrapException(H._TypeError$fromMessage(H._Error_compose(object, H.instanceOrFunctionType(object, testRti), H._rtiToString(testRti, null))));
     },
+    checkTypeBound: function(type, bound, variable, methodName) {
+      var _null = null;
+      if (H._isSubtype(init.typeUniverse, type, _null, bound, _null))
+        return type;
+      throw H.wrapException(H._TypeError$fromMessage("The type argument '" + H._rtiToString(type, _null) + "' is not a subtype of the type variable bound '" + H._rtiToString(bound, _null) + "' of type variable '" + variable + "' in '" + methodName + "'."));
+    },
     _Error_compose: function(object, objectRti, checkedTypeDescription) {
       var objectDescription = P.Error_safeToString(object),
         objectTypeDescription = H._rtiToString(objectRti == null ? H.instanceType(object) : objectRti, null);
@@ -2735,6 +2741,23 @@
     },
     unmangleGlobalNameIfPreservedAnyways: function($name) {
       return init.mangledGlobalNames[$name];
+    },
+    printString: function(string) {
+      if (typeof dartPrint == "function") {
+        dartPrint(string);
+        return;
+      }
+      if (typeof console == "object" && typeof console.log != "undefined") {
+        console.log(string);
+        return;
+      }
+      if (typeof window == "object")
+        return;
+      if (typeof print == "function") {
+        print(string);
+        return;
+      }
+      throw "Unable to print message: " + String(string);
     }
   },
   J = {
@@ -5509,6 +5532,10 @@
       this._element = t0;
       this._childElements = t1;
     },
+    _FrozenElementList: function _FrozenElementList(t0, t1) {
+      this._nodeList = t0;
+      this.$ti = t1;
+    },
     Element: function Element() {
     },
     Element_Element$html_closure: function Element_Element$html_closure() {
@@ -6088,8 +6115,11 @@
       this.phraseNumber = t0;
     }, Script_findPhrasesBySectionNumber_closure: function Script_findPhrasesBySectionNumber_closure(t0) {
       this.sectionNumber = t0;
-    }, Script_generateSectionHtmlElement_closure: function Script_generateSectionHtmlElement_closure(t0) {
-      this.phraseElement = t0;
+    }, Script_generateSectionHtmlElement_closure: function Script_generateSectionHtmlElement_closure(t0, t1) {
+      this.phraseListWrap = t0;
+      this.sectionSelectButton = t1;
+    }, Script_generateSectionHtmlElement__closure: function Script_generateSectionHtmlElement__closure() {
+    }, Script_generateSectionHtmlElement__closure0: function Script_generateSectionHtmlElement__closure0() {
     }, Script_generateSectionHtmlElement_closure0: function Script_generateSectionHtmlElement_closure0(t0, t1) {
       this.audio = t0;
       this.phrase = t1;
@@ -6506,7 +6536,7 @@
       t1._asyncComplete$1(null);
       return t1;
     },
-    $signature: 21
+    $signature: 22
   };
   H.EfficientLengthIterable.prototype = {};
   H.ListIterable.prototype = {
@@ -6943,19 +6973,19 @@
     call$1: function(o) {
       return this.getTag(o);
     },
-    $signature: 16
+    $signature: 17
   };
   H.initHooks_closure0.prototype = {
     call$2: function(o, tag) {
       return this.getUnknownTag(o, tag);
     },
-    $signature: 36
+    $signature: 37
   };
   H.initHooks_closure1.prototype = {
     call$1: function(tag) {
       return this.prototypeForTag(H._asString(tag));
     },
-    $signature: 37
+    $signature: 38
   };
   H.JSSyntaxRegExp.prototype = {
     toString$0: function(_) {
@@ -7157,7 +7187,7 @@
       t2 = this.span;
       t1.firstChild ? t1.removeChild(t2) : t1.appendChild(t2);
     },
-    $signature: 31
+    $signature: 32
   };
   P._AsyncRun__scheduleImmediateJsOverride_internalCallback.prototype = {
     call$0: function() {
@@ -7220,13 +7250,13 @@
     call$2: function(error, stackTrace) {
       this.bodyFunction.call$2(1, new H.ExceptionAndStackTrace(error, type$.StackTrace._as(stackTrace)));
     },
-    $signature: 17
+    $signature: 18
   };
   P._wrapJsFunctionForAsync_closure.prototype = {
     call$2: function(errorCode, result) {
       this.$protected(H._asInt(errorCode), result);
     },
-    $signature: 18
+    $signature: 19
   };
   P.AsyncError.prototype = {
     toString$0: function(_) {
@@ -7476,7 +7506,7 @@
     call$2: function(error, stackTrace) {
       this.$this._completeError$2(type$.Object._as(error), type$.StackTrace._as(stackTrace));
     },
-    $signature: 20
+    $signature: 21
   };
   P._Future__chainForeignFuture_closure1.prototype = {
     call$0: function() {
@@ -7541,7 +7571,7 @@
     call$1: function(_) {
       return this.originalSource;
     },
-    $signature: 26
+    $signature: 27
   };
   P._Future__propagateToListeners_handleValueCallback.prototype = {
     call$0: function() {
@@ -7635,7 +7665,7 @@
   P.Stream_forEach__closure0.prototype = {
     call$1: function(_) {
     },
-    $signature: 22
+    $signature: 23
   };
   P.Stream_length_closure.prototype = {
     call$1: function(_) {
@@ -7665,7 +7695,7 @@
     call$2: function(error, stackTrace) {
       P._cancelAndError(this.subscription, this.future, error, type$.StackTrace._as(stackTrace));
     },
-    $signature: 23
+    $signature: 24
   };
   P._Zone.prototype = {$isZone: 1};
   P._rootHandleUncaughtError_closure.prototype = {
@@ -7945,7 +7975,7 @@
       t1._contents = t2 + ": ";
       t1._contents += H.S(v);
     },
-    $signature: 24
+    $signature: 25
   };
   P.MapMixin.prototype = {
     forEach$1: function(receiver, action) {
@@ -8697,7 +8727,7 @@
     call$2: function(msg, position) {
       throw H.wrapException(P.FormatException$("Illegal IPv4 address, " + msg, this.host, position));
     },
-    $signature: 25
+    $signature: 26
   };
   P.Uri_parseIPv6Address_error.prototype = {
     call$2: function(msg, position) {
@@ -8706,7 +8736,7 @@
     call$1: function(msg) {
       return this.call$2(msg, null);
     },
-    $signature: 38
+    $signature: 39
   };
   P.Uri_parseIPv6Address_parseHex.prototype = {
     call$2: function(start, end) {
@@ -8718,7 +8748,7 @@
         this.error.call$2("each part must be in the range of `0x0..0xFFFF`", start);
       return value;
     },
-    $signature: 27
+    $signature: 28
   };
   P._Uri.prototype = {
     get$_text: function() {
@@ -8897,7 +8927,7 @@
       C.NativeUint8List_methods.fillRange$3(t1, 0, 96, defaultTransition);
       return t1;
     },
-    $signature: 28
+    $signature: 29
   };
   P._createTables_setChars.prototype = {
     call$3: function(target, chars, transition) {
@@ -9225,6 +9255,24 @@
       return new J.ArrayIterator(t1, t1.length, H._arrayInstanceType(t1)._eval$1("ArrayIterator<1>"));
     }
   };
+  W._FrozenElementList.prototype = {
+    get$length: function(_) {
+      return this._nodeList.length;
+    },
+    $index: function(_, index) {
+      var t1;
+      H._asInt(index);
+      t1 = this._nodeList;
+      if (index < 0 || index >= t1.length)
+        return H.ioore(t1, index);
+      return this.$ti._precomputed1._as(t1[index]);
+    },
+    $indexSet: function(_, index, value) {
+      H._asInt(index);
+      this.$ti._precomputed1._as(value);
+      throw H.wrapException(P.UnsupportedError$("Cannot modify list"));
+    }
+  };
   W.Element.prototype = {
     get$attributes: function(receiver) {
       return new W._ElementAttributeMap(receiver);
@@ -9445,7 +9493,7 @@
       else
         t3.completeError$1(e);
     },
-    $signature: 29
+    $signature: 30
   };
   W.HttpRequestEventTarget.prototype = {};
   W.ImageElement.prototype = {
@@ -9817,7 +9865,7 @@
     call$2: function(k, v) {
       return C.JSArray_methods.add$1(this.keys, k);
     },
-    $signature: 30
+    $signature: 31
   };
   W.StyleSheet.prototype = {$isStyleSheet: 1};
   W.TableElement.prototype = {
@@ -10371,7 +10419,7 @@
     call$1: function(attr) {
       return "TEMPLATE::" + H._asString(attr);
     },
-    $signature: 32
+    $signature: 33
   };
   W._SvgNodeValidator.prototype = {
     allowsElement$1: function(element) {
@@ -10587,7 +10635,7 @@
         child = nextChild;
       }
     },
-    $signature: 33
+    $signature: 34
   };
   W._CssStyleDeclaration_Interceptor_CssStyleDeclarationBase.prototype = {};
   W._DomRectList_Interceptor_ListMixin.prototype = {};
@@ -10708,7 +10756,7 @@
       J.$indexSet$ax(t1, key, t2);
       return t2;
     },
-    $signature: 34
+    $signature: 35
   };
   P._AcceptStructuredCloneDart2Js.prototype = {
     forEachJsField$2: function(object, action) {
@@ -10764,7 +10812,7 @@
     call$1: function(n) {
       return type$.Element._as(type$.Node._as(n));
     },
-    $signature: 35
+    $signature: 36
   };
   P.NullRejectionException.prototype = {
     toString$0: function(_) {
@@ -11323,21 +11371,42 @@
         if (t1 != null)
           t1.removeAttribute("style");
       } else {
-        if (!t2) {
-          t2 = bookScreen.style;
-          t2.display = "none";
-        }
-        t2 = t1.querySelector(_s11_);
-        if (t2 != null) {
-          t3 = t2.style;
-          t3.width = "2%";
-          t2 = t2.style;
-          t2.visibility = "visible";
-        }
-        t1 = t1.querySelector(_s21_);
-        if (t1 != null) {
-          t1 = t1.style;
-          t1.width = "78%";
+        t3 = window.screen.width;
+        t3.toString;
+        if (t3 < 768) {
+          if (!t2) {
+            t2 = bookScreen.style;
+            t2.display = "none";
+          }
+          t2 = t1.querySelector(_s11_);
+          if (t2 != null) {
+            t3 = t2.style;
+            t3.height = "2%";
+            t2 = t2.style;
+            t2.visibility = "visible";
+          }
+          t1 = t1.querySelector(_s21_);
+          if (t1 != null) {
+            t1 = t1.style;
+            t1.height = "60%";
+          }
+        } else {
+          if (!t2) {
+            t2 = bookScreen.style;
+            t2.display = "none";
+          }
+          t2 = t1.querySelector(_s11_);
+          if (t2 != null) {
+            t3 = t2.style;
+            t3.width = "2%";
+            t2 = t2.style;
+            t2.visibility = "visible";
+          }
+          t1 = t1.querySelector(_s21_);
+          if (t1 != null) {
+            t1 = t1.style;
+            t1.width = "78%";
+          }
         }
       }
     },
@@ -11404,36 +11473,39 @@
       return P.List_List$of(new H.WhereIterable(t1, t2._eval$1("bool(1)")._as(new N.Script_findPhrasesBySectionNumber_closure(sectionNumber)), t3), true, t3._eval$1("Iterable.E"));
     },
     generateSectionHtmlElement$1: function(audio) {
-      var t1, t2, t3, section, list, t4, sectionItem, sectionSelectorElement, index, phrase, phraseElement, phraseSelectButton, phraseContextElement, t5,
-        _s17_ = ".section-selector";
+      var t1, t2, t3, section, list, t4, sectionSelectButton, sectionSelectorButtonListElement, phraseListWrap, t5, index, phrase, phraseElement, phraseSelectButton, phraseContextElement, sectionItemList;
       for (t1 = type$._ElementEventStreamImpl_MouseEvent, t2 = t1._eval$1("~(1)?"), t3 = type$.nullable_void_Function, t1 = t1._precomputed1, section = 1; section < 46; ++section) {
         list = this.findPhrasesBySectionNumber$1(section);
         t4 = document;
-        sectionItem = t4.createElement("div");
-        C.DivElement_methods.set$text(sectionItem, C.JSInt_methods.toString$0(section));
-        sectionItem.className = "section-item";
-        sectionSelectorElement = t4.querySelector(_s17_);
-        if (sectionSelectorElement != null)
-          J.get$children$x(sectionSelectorElement).add$1(0, sectionItem);
+        sectionSelectButton = t4.createElement("div");
+        C.DivElement_methods.set$text(sectionSelectButton, C.JSInt_methods.toString$0(section));
+        sectionSelectButton.id = "not-selected-button";
+        sectionSelectButton.className = "section-select-button";
+        sectionSelectorButtonListElement = t4.querySelector(".section-selector-button-list");
+        if (sectionSelectorButtonListElement != null)
+          J.get$children$x(sectionSelectorButtonListElement).add$1(0, sectionSelectButton);
+        phraseListWrap = t4.createElement("div");
+        phraseListWrap.className = "phrase-list-wrap-hidden";
+        t5 = t2._as(new N.Script_generateSectionHtmlElement_closure(phraseListWrap, sectionSelectButton));
+        t3._as(null);
+        W._EventStreamSubscription$(sectionSelectButton, "click", t5, false, t1);
         for (index = 0; index < list.length; ++index) {
           phrase = list[index];
           phraseElement = t4.createElement("div");
-          phraseElement.className = "phrase-hidden";
+          phraseElement.className = "phrase";
           phraseSelectButton = t4.createElement("div");
           phraseSelectButton.className = "phrase-select";
           C.DivElement_methods.setInnerHtml$1(phraseSelectButton, '<span class="material-icons">west</span>');
           phraseContextElement = t4.createElement("div");
           phraseContextElement.className = "phrase-context";
           C.DivElement_methods.set$text(phraseContextElement, phrase.engText);
-          t5 = t2._as(new N.Script_generateSectionHtmlElement_closure(phraseElement));
-          t3._as(null);
-          W._EventStreamSubscription$(sectionItem, "click", t5, false, t1);
           W._EventStreamSubscription$(phraseSelectButton, "click", t2._as(new N.Script_generateSectionHtmlElement_closure0(audio, phrase)), false, t1);
           phraseElement.appendChild(phraseSelectButton);
           phraseElement.appendChild(phraseContextElement);
-          sectionSelectorElement = t4.querySelector(_s17_);
-          if (sectionSelectorElement != null)
-            J.get$children$x(sectionSelectorElement).add$1(0, phraseElement);
+          phraseListWrap.appendChild(phraseElement);
+          sectionItemList = t4.querySelector(".phrase-list");
+          if (sectionItemList != null)
+            J.get$children$x(sectionItemList).add$1(0, phraseListWrap);
         }
       }
     }
@@ -11468,12 +11540,36 @@
   };
   N.Script_generateSectionHtmlElement_closure.prototype = {
     call$1: function($event) {
-      var t1;
+      var t1, t2, t3, t4,
+        _s16_ = "querySelectorAll";
       type$.MouseEvent._as($event);
-      t1 = this.phraseElement;
-      t1.className = t1.className === "phrase" ? "phrase-hidden" : "phrase";
+      t1 = type$.Element;
+      t2 = document;
+      H.checkTypeBound(t1, t1, "T", _s16_);
+      t3 = type$._FrozenElementList_Element;
+      t4 = new W._FrozenElementList(t2.querySelectorAll(".phrase-list-wrap"), t3);
+      t4.forEach$1(t4, new N.Script_generateSectionHtmlElement__closure());
+      this.phraseListWrap.className = "phrase-list-wrap";
+      H.checkTypeBound(t1, t1, "T", _s16_);
+      t3 = new W._FrozenElementList(t2.querySelectorAll("#selected-button"), t3);
+      t3.forEach$1(t3, new N.Script_generateSectionHtmlElement__closure0());
+      this.sectionSelectButton.id = "selected-button";
     },
     $signature: 1
+  };
+  N.Script_generateSectionHtmlElement__closure.prototype = {
+    call$1: function(e) {
+      type$.Element._as(e);
+      H.printString(e.className);
+      e.className = "phrase-list-wrap-hidden";
+    },
+    $signature: 16
+  };
+  N.Script_generateSectionHtmlElement__closure0.prototype = {
+    call$1: function(e) {
+      type$.Element._as(e).id = "not-selected-button";
+    },
+    $signature: 16
   };
   N.Script_generateSectionHtmlElement_closure0.prototype = {
     call$1: function($event) {
@@ -11504,7 +11600,7 @@
     _static_1(P, "async__AsyncRun__scheduleImmediateWithSetImmediate$closure", "_AsyncRun__scheduleImmediateWithSetImmediate", 4);
     _static_1(P, "async__AsyncRun__scheduleImmediateWithTimer$closure", "_AsyncRun__scheduleImmediateWithTimer", 4);
     _static_0(P, "async___startMicrotaskLoop$closure", "_startMicrotaskLoop", 0);
-    _instance(P._Completer.prototype, "get$completeError", 0, 1, null, ["call$2", "call$1"], ["completeError$2", "completeError$1"], 19, 0);
+    _instance(P._Completer.prototype, "get$completeError", 0, 1, null, ["call$2", "call$1"], ["completeError$2", "completeError$1"], 20, 0);
     _static(W, "html__Html5NodeValidator__standardAttributeValidator$closure", 4, null, ["call$4"], ["_Html5NodeValidator__standardAttributeValidator"], 11, 0);
     _static(W, "html__Html5NodeValidator__uriAttributeValidator$closure", 4, null, ["call$4"], ["_Html5NodeValidator__uriAttributeValidator"], 11, 0);
   })();
@@ -11520,9 +11616,9 @@
     _inheritMany(J.JSNumber, [J.JSInt, J.JSNumNotInt]);
     _inheritMany(P.Error, [H.LateError, P.TypeError, H.JsNoSuchMethodError, H.UnknownJsTypeError, H.RuntimeError, P.AssertionError, H._Error, P.NullThrownError, P.ArgumentError, P.UnsupportedError, P.UnimplementedError, P.StateError, P.ConcurrentModificationError, P.CyclicInitializationError, B._FirebaseErrorWrapper]);
     _inherit(P.ListBase, P._ListBase_Object_ListMixin);
-    _inheritMany(P.ListBase, [H.UnmodifiableListBase, W._ChildrenElementList, W._ChildNodeListLazy, P.FilteredElementList]);
+    _inheritMany(P.ListBase, [H.UnmodifiableListBase, W._ChildrenElementList, W._FrozenElementList, W._ChildNodeListLazy, P.FilteredElementList]);
     _inherit(H.CodeUnits, H.UnmodifiableListBase);
-    _inheritMany(H.Closure, [H.nullFuture_closure, H.TearOffClosure, H.initHooks_closure, H.initHooks_closure0, H.initHooks_closure1, P._AsyncRun__initializeScheduleImmediate_internalCallback, P._AsyncRun__initializeScheduleImmediate_closure, P._AsyncRun__scheduleImmediateJsOverride_internalCallback, P._AsyncRun__scheduleImmediateWithSetImmediate_internalCallback, P._TimerImpl_internalCallback, P._awaitOnObject_closure, P._awaitOnObject_closure0, P._wrapJsFunctionForAsync_closure, P._Future__addListener_closure, P._Future__prependListeners_closure, P._Future__chainForeignFuture_closure, P._Future__chainForeignFuture_closure0, P._Future__chainForeignFuture_closure1, P._Future__asyncCompleteWithValue_closure, P._Future__chainFuture_closure, P._Future__asyncCompleteError_closure, P._Future__propagateToListeners_handleWhenCompleteCallback, P._Future__propagateToListeners_handleWhenCompleteCallback_closure, P._Future__propagateToListeners_handleValueCallback, P._Future__propagateToListeners_handleError, P.Stream_forEach_closure, P.Stream_forEach_closure0, P.Stream_forEach__closure, P.Stream_forEach__closure0, P.Stream_length_closure, P.Stream_length_closure0, P._cancelAndError_closure, P._cancelAndErrorClosure_closure, P._rootHandleUncaughtError_closure, P._RootZone_bindCallbackGuarded_closure, P._RootZone_bindUnaryCallbackGuarded_closure, P.MapBase_mapToString_closure, P.Utf8Decoder__decoder_closure, P.Utf8Decoder__decoderNonfatal_closure, P.Uri__parseIPv4Address_error, P.Uri_parseIPv6Address_error, P.Uri_parseIPv6Address_parseHex, P._createTables_build, P._createTables_setChars, P._createTables_setRange, W.Element_Element$html_closure, W.HttpRequest_request_closure, W.MidiInputMap_keys_closure, W.MidiOutputMap_keys_closure, W.RtcStatsReport_keys_closure, W.Storage_keys_closure, W._EventStreamSubscription_closure, W._EventStreamSubscription_onData_closure, W.NodeValidatorBuilder_allowsElement_closure, W.NodeValidatorBuilder_allowsAttribute_closure, W._SimpleNodeValidator_closure, W._SimpleNodeValidator_closure0, W._TemplatingNodeValidator_closure, W._ValidatingTreeSanitizer_sanitizeTree_walk, P._AcceptStructuredClone_walk_closure, P.FilteredElementList__iterable_closure, P.FilteredElementList__iterable_closure0, P.promiseToFuture_closure, P.promiseToFuture_closure0, P.AudioParamMap_keys_closure, R.Audio_closure, R.Audio_closure0, R.Audio_closure1, R.Audio_closure2, R.Audio_closure3, R.Audio_closure4, F.main_closure, F.main_closure0, N.Script_fetchData_closure, N.Script_fetchData__closure, N.Script_getScriptContext_closure, N.Script_findPhrasesBySectionNumber_closure, N.Script_generateSectionHtmlElement_closure, N.Script_generateSectionHtmlElement_closure0]);
+    _inheritMany(H.Closure, [H.nullFuture_closure, H.TearOffClosure, H.initHooks_closure, H.initHooks_closure0, H.initHooks_closure1, P._AsyncRun__initializeScheduleImmediate_internalCallback, P._AsyncRun__initializeScheduleImmediate_closure, P._AsyncRun__scheduleImmediateJsOverride_internalCallback, P._AsyncRun__scheduleImmediateWithSetImmediate_internalCallback, P._TimerImpl_internalCallback, P._awaitOnObject_closure, P._awaitOnObject_closure0, P._wrapJsFunctionForAsync_closure, P._Future__addListener_closure, P._Future__prependListeners_closure, P._Future__chainForeignFuture_closure, P._Future__chainForeignFuture_closure0, P._Future__chainForeignFuture_closure1, P._Future__asyncCompleteWithValue_closure, P._Future__chainFuture_closure, P._Future__asyncCompleteError_closure, P._Future__propagateToListeners_handleWhenCompleteCallback, P._Future__propagateToListeners_handleWhenCompleteCallback_closure, P._Future__propagateToListeners_handleValueCallback, P._Future__propagateToListeners_handleError, P.Stream_forEach_closure, P.Stream_forEach_closure0, P.Stream_forEach__closure, P.Stream_forEach__closure0, P.Stream_length_closure, P.Stream_length_closure0, P._cancelAndError_closure, P._cancelAndErrorClosure_closure, P._rootHandleUncaughtError_closure, P._RootZone_bindCallbackGuarded_closure, P._RootZone_bindUnaryCallbackGuarded_closure, P.MapBase_mapToString_closure, P.Utf8Decoder__decoder_closure, P.Utf8Decoder__decoderNonfatal_closure, P.Uri__parseIPv4Address_error, P.Uri_parseIPv6Address_error, P.Uri_parseIPv6Address_parseHex, P._createTables_build, P._createTables_setChars, P._createTables_setRange, W.Element_Element$html_closure, W.HttpRequest_request_closure, W.MidiInputMap_keys_closure, W.MidiOutputMap_keys_closure, W.RtcStatsReport_keys_closure, W.Storage_keys_closure, W._EventStreamSubscription_closure, W._EventStreamSubscription_onData_closure, W.NodeValidatorBuilder_allowsElement_closure, W.NodeValidatorBuilder_allowsAttribute_closure, W._SimpleNodeValidator_closure, W._SimpleNodeValidator_closure0, W._TemplatingNodeValidator_closure, W._ValidatingTreeSanitizer_sanitizeTree_walk, P._AcceptStructuredClone_walk_closure, P.FilteredElementList__iterable_closure, P.FilteredElementList__iterable_closure0, P.promiseToFuture_closure, P.promiseToFuture_closure0, P.AudioParamMap_keys_closure, R.Audio_closure, R.Audio_closure0, R.Audio_closure1, R.Audio_closure2, R.Audio_closure3, R.Audio_closure4, F.main_closure, F.main_closure0, N.Script_fetchData_closure, N.Script_fetchData__closure, N.Script_getScriptContext_closure, N.Script_findPhrasesBySectionNumber_closure, N.Script_generateSectionHtmlElement_closure, N.Script_generateSectionHtmlElement__closure, N.Script_generateSectionHtmlElement__closure0, N.Script_generateSectionHtmlElement_closure0]);
     _inheritMany(P.Iterable, [H.EfficientLengthIterable, H.MappedIterable, H.WhereIterable]);
     _inheritMany(H.EfficientLengthIterable, [H.ListIterable, H.LinkedHashMapKeyIterable]);
     _inheritMany(P.Iterator, [H.MappedIterator, H.WhereIterator]);
@@ -11695,12 +11791,12 @@
     mangledNames: {},
     getTypeFromName: getGlobalFromName,
     metadata: [],
-    types: ["~()", "~(MouseEvent)", "~(String,@)", "~(Event)", "~(~())", "Null(@)", "~(@)", "Null()", "@()", "~(Uint8List,String,int)", "bool(Node)", "bool(Element,String,String,_Html5NodeValidator)", "bool(NodeValidator)", "bool(String)", "Null(@,@)", "bool(Phrase)", "@(@)", "Null(@,StackTrace)", "~(int,@)", "~(Object[StackTrace?])", "Null(Object,StackTrace)", "Future<Null>()", "Null(~)", "~(Object,StackTrace)", "~(Object?,Object?)", "~(String,int)", "_Future<@>(@)", "int(int,int)", "Uint8List(@,@)", "~(ProgressEvent)", "~(String,String)", "Null(~())", "String(String)", "~(Node,Node?)", "@(@,@)", "Element(Node)", "@(@,String)", "@(String)", "~(String[@])"],
+    types: ["~()", "~(MouseEvent)", "~(String,@)", "~(Event)", "~(~())", "Null(@)", "~(@)", "Null()", "@()", "~(Uint8List,String,int)", "bool(Node)", "bool(Element,String,String,_Html5NodeValidator)", "bool(NodeValidator)", "bool(String)", "Null(@,@)", "bool(Phrase)", "~(Element)", "@(@)", "Null(@,StackTrace)", "~(int,@)", "~(Object[StackTrace?])", "Null(Object,StackTrace)", "Future<Null>()", "Null(~)", "~(Object,StackTrace)", "~(Object?,Object?)", "~(String,int)", "_Future<@>(@)", "int(int,int)", "Uint8List(@,@)", "~(ProgressEvent)", "~(String,String)", "Null(~())", "String(String)", "~(Node,Node?)", "@(@,@)", "Element(Node)", "@(@,String)", "@(String)", "~(String[@])"],
     interceptorsByTag: null,
     leafTags: null,
     arrayRti: typeof Symbol == "function" && typeof Symbol() == "symbol" ? Symbol("$ti") : "$ti"
   };
-  H._Universe_addRules(init.typeUniverse, JSON.parse('{"PlainJavaScriptObject":"JavaScriptObject","UnknownJavaScriptObject":"JavaScriptObject","JavaScriptFunction":"JavaScriptObject","AnalyticsJsImpl":"JavaScriptObject","AnalyticsCallOptionsJsImpl":"JavaScriptObject","AppJsImpl":"JavaScriptObject","AuthJsImpl":"JavaScriptObject","Persistence":"JavaScriptObject","AuthCredential":"JavaScriptObject","OAuthCredential":"JavaScriptObject","AuthProviderJsImpl":"JavaScriptObject","EmailAuthProviderJsImpl":"JavaScriptObject","FacebookAuthProviderJsImpl":"JavaScriptObject","GithubAuthProviderJsImpl":"JavaScriptObject","GoogleAuthProviderJsImpl":"JavaScriptObject","OAuthProviderJsImpl":"JavaScriptObject","TwitterAuthProviderJsImpl":"JavaScriptObject","PhoneAuthProviderJsImpl":"JavaScriptObject","ApplicationVerifierJsImpl":"JavaScriptObject","RecaptchaVerifierJsImpl":"JavaScriptObject","ConfirmationResultJsImpl":"JavaScriptObject","ActionCodeInfo":"JavaScriptObject","UserMetadata":"JavaScriptObject","AuthError":"JavaScriptObject","ActionCodeEmail":"JavaScriptObject","ActionCodeSettings":"JavaScriptObject","IosSettings":"JavaScriptObject","AndroidSettings":"JavaScriptObject","UserCredentialJsImpl":"JavaScriptObject","AdditionalUserInfoJsImpl":"JavaScriptObject","ServerValue":"JavaScriptObject","DatabaseJsImpl":"JavaScriptObject","ReferenceJsImpl":"JavaScriptObject","QueryJsImpl":"JavaScriptObject","DataSnapshotJsImpl":"JavaScriptObject","OnDisconnectJsImpl":"JavaScriptObject","ThenableReferenceJsImpl":"JavaScriptObject","TransactionJsImpl":"JavaScriptObject","PromiseJsImpl":"JavaScriptObject","UserJsImpl":"JavaScriptObject","IdTokenResultImpl":"JavaScriptObject","UserInfoJsImpl":"JavaScriptObject","FirebaseError":"JavaScriptObject","UserProfile":"JavaScriptObject","FirebaseOptions":"JavaScriptObject","DocumentSnapshotJsImpl":"JavaScriptObject","FirestoreJsImpl":"JavaScriptObject","PersistenceSettings":"JavaScriptObject","WriteBatchJsImpl":"JavaScriptObject","CollectionReferenceJsImpl":"JavaScriptObject","FieldPath":"JavaScriptObject","GeoPoint":"JavaScriptObject","Blob0":"JavaScriptObject","DocumentChangeJsImpl":"JavaScriptObject","DocumentReferenceJsImpl":"JavaScriptObject","FieldValue":"JavaScriptObject","QueryJsImpl0":"JavaScriptObject","QuerySnapshotJsImpl":"JavaScriptObject","TransactionJsImpl0":"JavaScriptObject","TimestampJsImpl":"JavaScriptObject","FirestoreError":"JavaScriptObject","SnapshotListenOptions":"JavaScriptObject","Settings":"JavaScriptObject","SnapshotMetadata":"JavaScriptObject","DocumentListenOptions":"JavaScriptObject","SetOptions":"JavaScriptObject","HttpsCallableResultJsImpl":"JavaScriptObject","FunctionsJsImpl":"JavaScriptObject","HttpsCallableJsImpl":"JavaScriptObject","HttpsCallableOptions":"JavaScriptObject","HttpsErrorJsImpl":"JavaScriptObject","ErrorJsImpl":"JavaScriptObject","MessagingJsImpl":"JavaScriptObject","NotificationJsImpl":"JavaScriptObject","PayloadJsImpl":"JavaScriptObject","PerformanceJsImpl":"JavaScriptObject","TraceJsImpl":"JavaScriptObject","RemoteConfigJsImpl":"JavaScriptObject","ValueJsImpl":"JavaScriptObject","SettingsJsImpl":"JavaScriptObject","StorageJsImpl":"JavaScriptObject","ReferenceJsImpl0":"JavaScriptObject","UploadTaskSnapshotJsImpl":"JavaScriptObject","FullMetadataJsImpl":"JavaScriptObject","UploadMetadataJsImpl":"JavaScriptObject","UploadTaskJsImpl":"JavaScriptObject","SettableMetadataJsImpl":"JavaScriptObject","ListOptionsJsImpl":"JavaScriptObject","ListResultJsImpl":"JavaScriptObject","StringFormat":"JavaScriptObject","TaskEvent":"JavaScriptObject","AbortPaymentEvent":"Event","ExtendableEvent":"Event","AudioContext":"BaseAudioContext","AbsoluteOrientationSensor":"EventTarget","OrientationSensor":"EventTarget","Sensor":"EventTarget","AElement":"SvgElement","GraphicsElement":"SvgElement","_ResourceProgressEvent":"ProgressEvent","BRElement":"HtmlElement","ShadowRoot":"Node","DocumentFragment":"Node","XmlDocument":"Document","PointerEvent":"MouseEvent","VttCue":"TextTrackCue","VideoElement":"MediaElement","CompositionEvent":"UIEvent","CDataSection":"CharacterData","Text":"CharacterData","HttpRequestUpload":"HttpRequestEventTarget","HtmlFormControlsCollection":"HtmlCollection","CssCharsetRule":"CssRule","CssStyleSheet":"StyleSheet","NativeFloat32List":"NativeTypedArrayOfDouble","JavaScriptObject":{"AppJsImpl":[],"PromiseJsImpl":["1&"],"FirebaseError":[],"DocumentSnapshotJsImpl":[],"HttpsCallableResultJsImpl":[],"StorageJsImpl":[],"ReferenceJsImpl0":[],"UploadTaskSnapshotJsImpl":[]},"JSBool":{"bool":[]},"JSNull":{"Null":[]},"JSArray":{"List":["1"],"Iterable":["1"]},"JSUnmodifiableArray":{"JSArray":["1"],"List":["1"],"Iterable":["1"]},"ArrayIterator":{"Iterator":["1"]},"JSNumber":{"double":[],"num":[]},"JSInt":{"double":[],"int":[],"num":[]},"JSNumNotInt":{"double":[],"num":[]},"JSString":{"String":[],"Pattern":[]},"LateError":{"Error":[]},"CodeUnits":{"ListMixin":["int"],"UnmodifiableListMixin":["int"],"List":["int"],"Iterable":["int"],"ListMixin.E":"int","UnmodifiableListMixin.E":"int"},"EfficientLengthIterable":{"Iterable":["1"]},"ListIterable":{"Iterable":["1"]},"ListIterator":{"Iterator":["1"]},"MappedIterable":{"Iterable":["2"],"Iterable.E":"2"},"MappedIterator":{"Iterator":["2"]},"MappedListIterable":{"ListIterable":["2"],"Iterable":["2"],"ListIterable.E":"2","Iterable.E":"2"},"WhereIterable":{"Iterable":["1"],"Iterable.E":"1"},"WhereIterator":{"Iterator":["1"]},"UnmodifiableListBase":{"ListMixin":["1"],"UnmodifiableListMixin":["1"],"List":["1"],"Iterable":["1"]},"NullError":{"NoSuchMethodError":[],"Error":[]},"JsNoSuchMethodError":{"NoSuchMethodError":[],"Error":[]},"UnknownJsTypeError":{"Error":[]},"_StackTrace":{"StackTrace":[]},"Closure":{"Function":[]},"TearOffClosure":{"Function":[]},"StaticClosure":{"Function":[]},"BoundClosure":{"Function":[]},"RuntimeError":{"Error":[]},"_AssertionError":{"Error":[]},"JsLinkedHashMap":{"MapMixin":["1","2"],"Map":["1","2"],"MapMixin.K":"1","MapMixin.V":"2"},"LinkedHashMapKeyIterable":{"Iterable":["1"],"Iterable.E":"1"},"LinkedHashMapKeyIterator":{"Iterator":["1"]},"JSSyntaxRegExp":{"Pattern":[]},"_MatchImplementation":{"RegExpMatch":[]},"_AllMatchesIterator":{"Iterator":["RegExpMatch"]},"NativeTypedArray":{"JavaScriptIndexingBehavior":["1"]},"NativeTypedArrayOfDouble":{"ListMixin":["double"],"JavaScriptIndexingBehavior":["double"],"List":["double"],"Iterable":["double"],"FixedLengthListMixin":["double"],"ListMixin.E":"double"},"NativeTypedArrayOfInt":{"ListMixin":["int"],"JavaScriptIndexingBehavior":["int"],"List":["int"],"Iterable":["int"],"FixedLengthListMixin":["int"]},"NativeInt16List":{"ListMixin":["int"],"JavaScriptIndexingBehavior":["int"],"List":["int"],"Iterable":["int"],"FixedLengthListMixin":["int"],"ListMixin.E":"int"},"NativeInt32List":{"ListMixin":["int"],"JavaScriptIndexingBehavior":["int"],"List":["int"],"Iterable":["int"],"FixedLengthListMixin":["int"],"ListMixin.E":"int"},"NativeInt8List":{"ListMixin":["int"],"JavaScriptIndexingBehavior":["int"],"List":["int"],"Iterable":["int"],"FixedLengthListMixin":["int"],"ListMixin.E":"int"},"NativeUint16List":{"ListMixin":["int"],"JavaScriptIndexingBehavior":["int"],"List":["int"],"Iterable":["int"],"FixedLengthListMixin":["int"],"ListMixin.E":"int"},"NativeUint32List":{"ListMixin":["int"],"JavaScriptIndexingBehavior":["int"],"List":["int"],"Iterable":["int"],"FixedLengthListMixin":["int"],"ListMixin.E":"int"},"NativeUint8ClampedList":{"ListMixin":["int"],"JavaScriptIndexingBehavior":["int"],"List":["int"],"Iterable":["int"],"FixedLengthListMixin":["int"],"ListMixin.E":"int"},"NativeUint8List":{"ListMixin":["int"],"Uint8List":[],"JavaScriptIndexingBehavior":["int"],"List":["int"],"Iterable":["int"],"FixedLengthListMixin":["int"],"ListMixin.E":"int"},"_Error":{"Error":[]},"_TypeError":{"Error":[]},"_Future":{"Future":["1"]},"AsyncError":{"Error":[]},"_AsyncCompleter":{"_Completer":["1"]},"_Zone":{"Zone":[]},"_RootZone":{"_Zone":[],"Zone":[]},"_LinkedHashSet":{"SetMixin":["1"],"Set":["1"],"Iterable":["1"]},"_LinkedHashSetIterator":{"Iterator":["1"]},"ListBase":{"ListMixin":["1"],"List":["1"],"Iterable":["1"]},"MapBase":{"MapMixin":["1","2"],"Map":["1","2"]},"MapMixin":{"Map":["1","2"]},"_SetBase":{"SetMixin":["1"],"Set":["1"],"Iterable":["1"]},"_JsonMap":{"MapMixin":["String","@"],"Map":["String","@"],"MapMixin.K":"String","MapMixin.V":"@"},"_JsonMapKeyIterable":{"ListIterable":["String"],"Iterable":["String"],"ListIterable.E":"String","Iterable.E":"String"},"Base64Codec":{"Codec":["List<int>","String"]},"Base64Encoder":{"Converter":["List<int>","String"]},"Encoding":{"Codec":["String","List<int>"]},"JsonCodec":{"Codec":["Object?","String"]},"JsonDecoder":{"Converter":["String","Object?"]},"Utf8Codec":{"Codec":["String","List<int>"]},"Utf8Decoder":{"Converter":["List<int>","String"]},"double":{"num":[]},"int":{"num":[]},"List":{"Iterable":["1"]},"String":{"Pattern":[]},"AssertionError":{"Error":[]},"TypeError":{"Error":[]},"NullThrownError":{"Error":[]},"ArgumentError":{"Error":[]},"RangeError":{"Error":[]},"IndexError":{"Error":[]},"UnsupportedError":{"Error":[]},"UnimplementedError":{"Error":[]},"StateError":{"Error":[]},"ConcurrentModificationError":{"Error":[]},"OutOfMemoryError":{"Error":[]},"StackOverflowError":{"Error":[]},"CyclicInitializationError":{"Error":[]},"_StringStackTrace":{"StackTrace":[]},"StringBuffer":{"StringSink":[]},"_Uri":{"Uri":[]},"_SimpleUri":{"Uri":[]},"_DataUri":{"Uri":[]},"Element":{"Node":[],"EventTarget":[]},"FontFaceSet":{"EventTarget":[]},"HttpRequest":{"EventTarget":[]},"HttpRequestEventTarget":{"EventTarget":[]},"MouseEvent":{"Event":[]},"Node":{"EventTarget":[]},"ProgressEvent":{"Event":[]},"SourceBuffer":{"EventTarget":[]},"TextTrack":{"EventTarget":[]},"TextTrackCue":{"EventTarget":[]},"UIEvent":{"Event":[]},"_Html5NodeValidator":{"NodeValidator":[]},"HtmlElement":{"Element":[],"Node":[],"EventTarget":[]},"AnchorElement":{"Element":[],"Node":[],"EventTarget":[]},"AreaElement":{"Element":[],"Node":[],"EventTarget":[]},"AudioElement":{"Element":[],"Node":[],"EventTarget":[]},"BaseElement":{"Element":[],"Node":[],"EventTarget":[]},"BodyElement":{"Element":[],"Node":[],"EventTarget":[]},"CharacterData":{"Node":[],"EventTarget":[]},"DivElement":{"Element":[],"Node":[],"EventTarget":[]},"Document":{"Node":[],"EventTarget":[]},"DomRectList":{"ListMixin":["Rectangle<num>"],"ImmutableListMixin":["Rectangle<num>"],"List":["Rectangle<num>"],"JavaScriptIndexingBehavior":["Rectangle<num>"],"Iterable":["Rectangle<num>"],"ImmutableListMixin.E":"Rectangle<num>","ListMixin.E":"Rectangle<num>"},"DomRectReadOnly":{"Rectangle":["num"]},"DomStringList":{"ListMixin":["String"],"ImmutableListMixin":["String"],"List":["String"],"JavaScriptIndexingBehavior":["String"],"Iterable":["String"],"ImmutableListMixin.E":"String","ListMixin.E":"String"},"_ChildrenElementList":{"ListMixin":["Element"],"List":["Element"],"Iterable":["Element"],"ListMixin.E":"Element"},"FileList":{"ListMixin":["File"],"ImmutableListMixin":["File"],"List":["File"],"JavaScriptIndexingBehavior":["File"],"Iterable":["File"],"ImmutableListMixin.E":"File","ListMixin.E":"File"},"FileWriter":{"EventTarget":[]},"FormElement":{"Element":[],"Node":[],"EventTarget":[]},"HtmlCollection":{"ListMixin":["Node"],"ImmutableListMixin":["Node"],"List":["Node"],"JavaScriptIndexingBehavior":["Node"],"Iterable":["Node"],"ImmutableListMixin.E":"Node","ListMixin.E":"Node"},"HtmlDocument":{"Document":[],"Node":[],"EventTarget":[]},"ImageElement":{"Element":[],"Node":[],"EventTarget":[]},"MediaElement":{"Element":[],"Node":[],"EventTarget":[]},"MidiInputMap":{"MapMixin":["String","@"],"Map":["String","@"],"MapMixin.K":"String","MapMixin.V":"@"},"MidiOutputMap":{"MapMixin":["String","@"],"Map":["String","@"],"MapMixin.K":"String","MapMixin.V":"@"},"MimeTypeArray":{"ListMixin":["MimeType"],"ImmutableListMixin":["MimeType"],"List":["MimeType"],"JavaScriptIndexingBehavior":["MimeType"],"Iterable":["MimeType"],"ImmutableListMixin.E":"MimeType","ListMixin.E":"MimeType"},"_ChildNodeListLazy":{"ListMixin":["Node"],"List":["Node"],"Iterable":["Node"],"ListMixin.E":"Node"},"NodeList":{"ListMixin":["Node"],"ImmutableListMixin":["Node"],"List":["Node"],"JavaScriptIndexingBehavior":["Node"],"Iterable":["Node"],"ImmutableListMixin.E":"Node","ListMixin.E":"Node"},"PluginArray":{"ListMixin":["Plugin"],"ImmutableListMixin":["Plugin"],"List":["Plugin"],"JavaScriptIndexingBehavior":["Plugin"],"Iterable":["Plugin"],"ImmutableListMixin.E":"Plugin","ListMixin.E":"Plugin"},"RtcStatsReport":{"MapMixin":["String","@"],"Map":["String","@"],"MapMixin.K":"String","MapMixin.V":"@"},"SelectElement":{"Element":[],"Node":[],"EventTarget":[]},"SourceBufferList":{"ListMixin":["SourceBuffer"],"ImmutableListMixin":["SourceBuffer"],"List":["SourceBuffer"],"JavaScriptIndexingBehavior":["SourceBuffer"],"EventTarget":[],"Iterable":["SourceBuffer"],"ImmutableListMixin.E":"SourceBuffer","ListMixin.E":"SourceBuffer"},"SpeechGrammarList":{"ListMixin":["SpeechGrammar"],"ImmutableListMixin":["SpeechGrammar"],"List":["SpeechGrammar"],"JavaScriptIndexingBehavior":["SpeechGrammar"],"Iterable":["SpeechGrammar"],"ImmutableListMixin.E":"SpeechGrammar","ListMixin.E":"SpeechGrammar"},"Storage0":{"MapMixin":["String","String"],"Map":["String","String"],"MapMixin.K":"String","MapMixin.V":"String"},"TableElement":{"Element":[],"Node":[],"EventTarget":[]},"TableRowElement":{"Element":[],"Node":[],"EventTarget":[]},"TableSectionElement":{"Element":[],"Node":[],"EventTarget":[]},"TemplateElement":{"Element":[],"Node":[],"EventTarget":[]},"TextTrackCueList":{"ListMixin":["TextTrackCue"],"ImmutableListMixin":["TextTrackCue"],"List":["TextTrackCue"],"JavaScriptIndexingBehavior":["TextTrackCue"],"Iterable":["TextTrackCue"],"ImmutableListMixin.E":"TextTrackCue","ListMixin.E":"TextTrackCue"},"TextTrackList":{"ListMixin":["TextTrack"],"ImmutableListMixin":["TextTrack"],"List":["TextTrack"],"JavaScriptIndexingBehavior":["TextTrack"],"EventTarget":[],"Iterable":["TextTrack"],"ImmutableListMixin.E":"TextTrack","ListMixin.E":"TextTrack"},"TouchList":{"ListMixin":["Touch"],"ImmutableListMixin":["Touch"],"List":["Touch"],"JavaScriptIndexingBehavior":["Touch"],"Iterable":["Touch"],"ImmutableListMixin.E":"Touch","ListMixin.E":"Touch"},"VideoTrackList":{"EventTarget":[]},"_Attr":{"Node":[],"EventTarget":[]},"_CssRuleList":{"ListMixin":["CssRule"],"ImmutableListMixin":["CssRule"],"List":["CssRule"],"JavaScriptIndexingBehavior":["CssRule"],"Iterable":["CssRule"],"ImmutableListMixin.E":"CssRule","ListMixin.E":"CssRule"},"_DomRect":{"Rectangle":["num"]},"_GamepadList":{"ListMixin":["Gamepad?"],"ImmutableListMixin":["Gamepad?"],"List":["Gamepad?"],"JavaScriptIndexingBehavior":["Gamepad?"],"Iterable":["Gamepad?"],"ImmutableListMixin.E":"Gamepad?","ListMixin.E":"Gamepad?"},"_NamedNodeMap":{"ListMixin":["Node"],"ImmutableListMixin":["Node"],"List":["Node"],"JavaScriptIndexingBehavior":["Node"],"Iterable":["Node"],"ImmutableListMixin.E":"Node","ListMixin.E":"Node"},"_SpeechRecognitionResultList":{"ListMixin":["SpeechRecognitionResult"],"ImmutableListMixin":["SpeechRecognitionResult"],"List":["SpeechRecognitionResult"],"JavaScriptIndexingBehavior":["SpeechRecognitionResult"],"Iterable":["SpeechRecognitionResult"],"ImmutableListMixin.E":"SpeechRecognitionResult","ListMixin.E":"SpeechRecognitionResult"},"_StyleSheetList":{"ListMixin":["StyleSheet"],"ImmutableListMixin":["StyleSheet"],"List":["StyleSheet"],"JavaScriptIndexingBehavior":["StyleSheet"],"Iterable":["StyleSheet"],"ImmutableListMixin.E":"StyleSheet","ListMixin.E":"StyleSheet"},"_AttributeMap":{"MapMixin":["String","String"],"Map":["String","String"]},"_ElementAttributeMap":{"MapMixin":["String","String"],"Map":["String","String"],"MapMixin.K":"String","MapMixin.V":"String"},"_EventStream":{"Stream":["1"]},"_ElementEventStreamImpl":{"_EventStream":["1"],"Stream":["1"]},"_EventStreamSubscription":{"StreamSubscription":["1"]},"NodeValidatorBuilder":{"NodeValidator":[]},"_SimpleNodeValidator":{"NodeValidator":[]},"_TemplatingNodeValidator":{"NodeValidator":[]},"_SvgNodeValidator":{"NodeValidator":[]},"FixedSizeListIterator":{"Iterator":["1"]},"_SameOriginUriPolicy":{"UriPolicy":[]},"_ValidatingTreeSanitizer":{"NodeTreeSanitizer":[]},"FilteredElementList":{"ListMixin":["Element"],"List":["Element"],"Iterable":["Element"],"ListMixin.E":"Element"},"LengthList":{"ListMixin":["Length"],"ImmutableListMixin":["Length"],"List":["Length"],"Iterable":["Length"],"ImmutableListMixin.E":"Length","ListMixin.E":"Length"},"NumberList":{"ListMixin":["Number"],"ImmutableListMixin":["Number"],"List":["Number"],"Iterable":["Number"],"ImmutableListMixin.E":"Number","ListMixin.E":"Number"},"ScriptElement0":{"SvgElement":[],"Element":[],"Node":[],"EventTarget":[]},"StringList":{"ListMixin":["String"],"ImmutableListMixin":["String"],"List":["String"],"Iterable":["String"],"ImmutableListMixin.E":"String","ListMixin.E":"String"},"SvgElement":{"Element":[],"Node":[],"EventTarget":[]},"TransformList":{"ListMixin":["Transform"],"ImmutableListMixin":["Transform"],"List":["Transform"],"Iterable":["Transform"],"ImmutableListMixin.E":"Transform","ListMixin.E":"Transform"},"AudioParamMap":{"MapMixin":["String","@"],"Map":["String","@"],"MapMixin.K":"String","MapMixin.V":"@"},"AudioTrackList":{"EventTarget":[]},"BaseAudioContext":{"EventTarget":[]},"OfflineAudioContext":{"EventTarget":[]},"SqlResultSetRowList":{"ListMixin":["Map<@,@>"],"ImmutableListMixin":["Map<@,@>"],"List":["Map<@,@>"],"Iterable":["Map<@,@>"],"ImmutableListMixin.E":"Map<@,@>","ListMixin.E":"Map<@,@>"},"App":{"JsObjectWrapper":["AppJsImpl"],"JsObjectWrapper.T":"AppJsImpl"},"Storage":{"JsObjectWrapper":["StorageJsImpl"],"JsObjectWrapper.T":"StorageJsImpl"},"StorageReference":{"JsObjectWrapper":["ReferenceJsImpl0"],"JsObjectWrapper.T":"ReferenceJsImpl0"},"_FirebaseErrorWrapper":{"FirebaseError":[],"Error":[]},"Uint8List":{"List":["int"],"Iterable":["int"]}}'));
+  H._Universe_addRules(init.typeUniverse, JSON.parse('{"PlainJavaScriptObject":"JavaScriptObject","UnknownJavaScriptObject":"JavaScriptObject","JavaScriptFunction":"JavaScriptObject","AnalyticsJsImpl":"JavaScriptObject","AnalyticsCallOptionsJsImpl":"JavaScriptObject","AppJsImpl":"JavaScriptObject","AuthJsImpl":"JavaScriptObject","Persistence":"JavaScriptObject","AuthCredential":"JavaScriptObject","OAuthCredential":"JavaScriptObject","AuthProviderJsImpl":"JavaScriptObject","EmailAuthProviderJsImpl":"JavaScriptObject","FacebookAuthProviderJsImpl":"JavaScriptObject","GithubAuthProviderJsImpl":"JavaScriptObject","GoogleAuthProviderJsImpl":"JavaScriptObject","OAuthProviderJsImpl":"JavaScriptObject","TwitterAuthProviderJsImpl":"JavaScriptObject","PhoneAuthProviderJsImpl":"JavaScriptObject","ApplicationVerifierJsImpl":"JavaScriptObject","RecaptchaVerifierJsImpl":"JavaScriptObject","ConfirmationResultJsImpl":"JavaScriptObject","ActionCodeInfo":"JavaScriptObject","UserMetadata":"JavaScriptObject","AuthError":"JavaScriptObject","ActionCodeEmail":"JavaScriptObject","ActionCodeSettings":"JavaScriptObject","IosSettings":"JavaScriptObject","AndroidSettings":"JavaScriptObject","UserCredentialJsImpl":"JavaScriptObject","AdditionalUserInfoJsImpl":"JavaScriptObject","ServerValue":"JavaScriptObject","DatabaseJsImpl":"JavaScriptObject","ReferenceJsImpl":"JavaScriptObject","QueryJsImpl":"JavaScriptObject","DataSnapshotJsImpl":"JavaScriptObject","OnDisconnectJsImpl":"JavaScriptObject","ThenableReferenceJsImpl":"JavaScriptObject","TransactionJsImpl":"JavaScriptObject","PromiseJsImpl":"JavaScriptObject","UserJsImpl":"JavaScriptObject","IdTokenResultImpl":"JavaScriptObject","UserInfoJsImpl":"JavaScriptObject","FirebaseError":"JavaScriptObject","UserProfile":"JavaScriptObject","FirebaseOptions":"JavaScriptObject","DocumentSnapshotJsImpl":"JavaScriptObject","FirestoreJsImpl":"JavaScriptObject","PersistenceSettings":"JavaScriptObject","WriteBatchJsImpl":"JavaScriptObject","CollectionReferenceJsImpl":"JavaScriptObject","FieldPath":"JavaScriptObject","GeoPoint":"JavaScriptObject","Blob0":"JavaScriptObject","DocumentChangeJsImpl":"JavaScriptObject","DocumentReferenceJsImpl":"JavaScriptObject","FieldValue":"JavaScriptObject","QueryJsImpl0":"JavaScriptObject","QuerySnapshotJsImpl":"JavaScriptObject","TransactionJsImpl0":"JavaScriptObject","TimestampJsImpl":"JavaScriptObject","FirestoreError":"JavaScriptObject","SnapshotListenOptions":"JavaScriptObject","Settings":"JavaScriptObject","SnapshotMetadata":"JavaScriptObject","DocumentListenOptions":"JavaScriptObject","SetOptions":"JavaScriptObject","HttpsCallableResultJsImpl":"JavaScriptObject","FunctionsJsImpl":"JavaScriptObject","HttpsCallableJsImpl":"JavaScriptObject","HttpsCallableOptions":"JavaScriptObject","HttpsErrorJsImpl":"JavaScriptObject","ErrorJsImpl":"JavaScriptObject","MessagingJsImpl":"JavaScriptObject","NotificationJsImpl":"JavaScriptObject","PayloadJsImpl":"JavaScriptObject","PerformanceJsImpl":"JavaScriptObject","TraceJsImpl":"JavaScriptObject","RemoteConfigJsImpl":"JavaScriptObject","ValueJsImpl":"JavaScriptObject","SettingsJsImpl":"JavaScriptObject","StorageJsImpl":"JavaScriptObject","ReferenceJsImpl0":"JavaScriptObject","UploadTaskSnapshotJsImpl":"JavaScriptObject","FullMetadataJsImpl":"JavaScriptObject","UploadMetadataJsImpl":"JavaScriptObject","UploadTaskJsImpl":"JavaScriptObject","SettableMetadataJsImpl":"JavaScriptObject","ListOptionsJsImpl":"JavaScriptObject","ListResultJsImpl":"JavaScriptObject","StringFormat":"JavaScriptObject","TaskEvent":"JavaScriptObject","AbortPaymentEvent":"Event","ExtendableEvent":"Event","AudioContext":"BaseAudioContext","AbsoluteOrientationSensor":"EventTarget","OrientationSensor":"EventTarget","Sensor":"EventTarget","AElement":"SvgElement","GraphicsElement":"SvgElement","_ResourceProgressEvent":"ProgressEvent","BRElement":"HtmlElement","ShadowRoot":"Node","DocumentFragment":"Node","XmlDocument":"Document","PointerEvent":"MouseEvent","VttCue":"TextTrackCue","VideoElement":"MediaElement","CompositionEvent":"UIEvent","CDataSection":"CharacterData","Text":"CharacterData","HttpRequestUpload":"HttpRequestEventTarget","HtmlFormControlsCollection":"HtmlCollection","CssCharsetRule":"CssRule","CssStyleSheet":"StyleSheet","NativeFloat32List":"NativeTypedArrayOfDouble","JavaScriptObject":{"AppJsImpl":[],"PromiseJsImpl":["1&"],"FirebaseError":[],"DocumentSnapshotJsImpl":[],"HttpsCallableResultJsImpl":[],"StorageJsImpl":[],"ReferenceJsImpl0":[],"UploadTaskSnapshotJsImpl":[]},"JSBool":{"bool":[]},"JSNull":{"Null":[]},"JSArray":{"List":["1"],"Iterable":["1"]},"JSUnmodifiableArray":{"JSArray":["1"],"List":["1"],"Iterable":["1"]},"ArrayIterator":{"Iterator":["1"]},"JSNumber":{"double":[],"num":[]},"JSInt":{"double":[],"int":[],"num":[]},"JSNumNotInt":{"double":[],"num":[]},"JSString":{"String":[],"Pattern":[]},"LateError":{"Error":[]},"CodeUnits":{"ListMixin":["int"],"UnmodifiableListMixin":["int"],"List":["int"],"Iterable":["int"],"ListMixin.E":"int","UnmodifiableListMixin.E":"int"},"EfficientLengthIterable":{"Iterable":["1"]},"ListIterable":{"Iterable":["1"]},"ListIterator":{"Iterator":["1"]},"MappedIterable":{"Iterable":["2"],"Iterable.E":"2"},"MappedIterator":{"Iterator":["2"]},"MappedListIterable":{"ListIterable":["2"],"Iterable":["2"],"ListIterable.E":"2","Iterable.E":"2"},"WhereIterable":{"Iterable":["1"],"Iterable.E":"1"},"WhereIterator":{"Iterator":["1"]},"UnmodifiableListBase":{"ListMixin":["1"],"UnmodifiableListMixin":["1"],"List":["1"],"Iterable":["1"]},"NullError":{"NoSuchMethodError":[],"Error":[]},"JsNoSuchMethodError":{"NoSuchMethodError":[],"Error":[]},"UnknownJsTypeError":{"Error":[]},"_StackTrace":{"StackTrace":[]},"Closure":{"Function":[]},"TearOffClosure":{"Function":[]},"StaticClosure":{"Function":[]},"BoundClosure":{"Function":[]},"RuntimeError":{"Error":[]},"_AssertionError":{"Error":[]},"JsLinkedHashMap":{"MapMixin":["1","2"],"Map":["1","2"],"MapMixin.K":"1","MapMixin.V":"2"},"LinkedHashMapKeyIterable":{"Iterable":["1"],"Iterable.E":"1"},"LinkedHashMapKeyIterator":{"Iterator":["1"]},"JSSyntaxRegExp":{"Pattern":[]},"_MatchImplementation":{"RegExpMatch":[]},"_AllMatchesIterator":{"Iterator":["RegExpMatch"]},"NativeTypedArray":{"JavaScriptIndexingBehavior":["1"]},"NativeTypedArrayOfDouble":{"ListMixin":["double"],"JavaScriptIndexingBehavior":["double"],"List":["double"],"Iterable":["double"],"FixedLengthListMixin":["double"],"ListMixin.E":"double"},"NativeTypedArrayOfInt":{"ListMixin":["int"],"JavaScriptIndexingBehavior":["int"],"List":["int"],"Iterable":["int"],"FixedLengthListMixin":["int"]},"NativeInt16List":{"ListMixin":["int"],"JavaScriptIndexingBehavior":["int"],"List":["int"],"Iterable":["int"],"FixedLengthListMixin":["int"],"ListMixin.E":"int"},"NativeInt32List":{"ListMixin":["int"],"JavaScriptIndexingBehavior":["int"],"List":["int"],"Iterable":["int"],"FixedLengthListMixin":["int"],"ListMixin.E":"int"},"NativeInt8List":{"ListMixin":["int"],"JavaScriptIndexingBehavior":["int"],"List":["int"],"Iterable":["int"],"FixedLengthListMixin":["int"],"ListMixin.E":"int"},"NativeUint16List":{"ListMixin":["int"],"JavaScriptIndexingBehavior":["int"],"List":["int"],"Iterable":["int"],"FixedLengthListMixin":["int"],"ListMixin.E":"int"},"NativeUint32List":{"ListMixin":["int"],"JavaScriptIndexingBehavior":["int"],"List":["int"],"Iterable":["int"],"FixedLengthListMixin":["int"],"ListMixin.E":"int"},"NativeUint8ClampedList":{"ListMixin":["int"],"JavaScriptIndexingBehavior":["int"],"List":["int"],"Iterable":["int"],"FixedLengthListMixin":["int"],"ListMixin.E":"int"},"NativeUint8List":{"ListMixin":["int"],"Uint8List":[],"JavaScriptIndexingBehavior":["int"],"List":["int"],"Iterable":["int"],"FixedLengthListMixin":["int"],"ListMixin.E":"int"},"_Error":{"Error":[]},"_TypeError":{"Error":[]},"_Future":{"Future":["1"]},"AsyncError":{"Error":[]},"_AsyncCompleter":{"_Completer":["1"]},"_Zone":{"Zone":[]},"_RootZone":{"_Zone":[],"Zone":[]},"_LinkedHashSet":{"SetMixin":["1"],"Set":["1"],"Iterable":["1"]},"_LinkedHashSetIterator":{"Iterator":["1"]},"ListBase":{"ListMixin":["1"],"List":["1"],"Iterable":["1"]},"MapBase":{"MapMixin":["1","2"],"Map":["1","2"]},"MapMixin":{"Map":["1","2"]},"_SetBase":{"SetMixin":["1"],"Set":["1"],"Iterable":["1"]},"_JsonMap":{"MapMixin":["String","@"],"Map":["String","@"],"MapMixin.K":"String","MapMixin.V":"@"},"_JsonMapKeyIterable":{"ListIterable":["String"],"Iterable":["String"],"ListIterable.E":"String","Iterable.E":"String"},"Base64Codec":{"Codec":["List<int>","String"]},"Base64Encoder":{"Converter":["List<int>","String"]},"Encoding":{"Codec":["String","List<int>"]},"JsonCodec":{"Codec":["Object?","String"]},"JsonDecoder":{"Converter":["String","Object?"]},"Utf8Codec":{"Codec":["String","List<int>"]},"Utf8Decoder":{"Converter":["List<int>","String"]},"double":{"num":[]},"int":{"num":[]},"List":{"Iterable":["1"]},"String":{"Pattern":[]},"AssertionError":{"Error":[]},"TypeError":{"Error":[]},"NullThrownError":{"Error":[]},"ArgumentError":{"Error":[]},"RangeError":{"Error":[]},"IndexError":{"Error":[]},"UnsupportedError":{"Error":[]},"UnimplementedError":{"Error":[]},"StateError":{"Error":[]},"ConcurrentModificationError":{"Error":[]},"OutOfMemoryError":{"Error":[]},"StackOverflowError":{"Error":[]},"CyclicInitializationError":{"Error":[]},"_StringStackTrace":{"StackTrace":[]},"StringBuffer":{"StringSink":[]},"_Uri":{"Uri":[]},"_SimpleUri":{"Uri":[]},"_DataUri":{"Uri":[]},"Element":{"Node":[],"EventTarget":[]},"FontFaceSet":{"EventTarget":[]},"HttpRequest":{"EventTarget":[]},"HttpRequestEventTarget":{"EventTarget":[]},"MouseEvent":{"Event":[]},"Node":{"EventTarget":[]},"ProgressEvent":{"Event":[]},"SourceBuffer":{"EventTarget":[]},"TextTrack":{"EventTarget":[]},"TextTrackCue":{"EventTarget":[]},"UIEvent":{"Event":[]},"_Html5NodeValidator":{"NodeValidator":[]},"HtmlElement":{"Element":[],"Node":[],"EventTarget":[]},"AnchorElement":{"Element":[],"Node":[],"EventTarget":[]},"AreaElement":{"Element":[],"Node":[],"EventTarget":[]},"AudioElement":{"Element":[],"Node":[],"EventTarget":[]},"BaseElement":{"Element":[],"Node":[],"EventTarget":[]},"BodyElement":{"Element":[],"Node":[],"EventTarget":[]},"CharacterData":{"Node":[],"EventTarget":[]},"DivElement":{"Element":[],"Node":[],"EventTarget":[]},"Document":{"Node":[],"EventTarget":[]},"DomRectList":{"ListMixin":["Rectangle<num>"],"ImmutableListMixin":["Rectangle<num>"],"List":["Rectangle<num>"],"JavaScriptIndexingBehavior":["Rectangle<num>"],"Iterable":["Rectangle<num>"],"ImmutableListMixin.E":"Rectangle<num>","ListMixin.E":"Rectangle<num>"},"DomRectReadOnly":{"Rectangle":["num"]},"DomStringList":{"ListMixin":["String"],"ImmutableListMixin":["String"],"List":["String"],"JavaScriptIndexingBehavior":["String"],"Iterable":["String"],"ImmutableListMixin.E":"String","ListMixin.E":"String"},"_ChildrenElementList":{"ListMixin":["Element"],"List":["Element"],"Iterable":["Element"],"ListMixin.E":"Element"},"_FrozenElementList":{"ListMixin":["1"],"List":["1"],"Iterable":["1"],"ListMixin.E":"1"},"FileList":{"ListMixin":["File"],"ImmutableListMixin":["File"],"List":["File"],"JavaScriptIndexingBehavior":["File"],"Iterable":["File"],"ImmutableListMixin.E":"File","ListMixin.E":"File"},"FileWriter":{"EventTarget":[]},"FormElement":{"Element":[],"Node":[],"EventTarget":[]},"HtmlCollection":{"ListMixin":["Node"],"ImmutableListMixin":["Node"],"List":["Node"],"JavaScriptIndexingBehavior":["Node"],"Iterable":["Node"],"ImmutableListMixin.E":"Node","ListMixin.E":"Node"},"HtmlDocument":{"Document":[],"Node":[],"EventTarget":[]},"ImageElement":{"Element":[],"Node":[],"EventTarget":[]},"MediaElement":{"Element":[],"Node":[],"EventTarget":[]},"MidiInputMap":{"MapMixin":["String","@"],"Map":["String","@"],"MapMixin.K":"String","MapMixin.V":"@"},"MidiOutputMap":{"MapMixin":["String","@"],"Map":["String","@"],"MapMixin.K":"String","MapMixin.V":"@"},"MimeTypeArray":{"ListMixin":["MimeType"],"ImmutableListMixin":["MimeType"],"List":["MimeType"],"JavaScriptIndexingBehavior":["MimeType"],"Iterable":["MimeType"],"ImmutableListMixin.E":"MimeType","ListMixin.E":"MimeType"},"_ChildNodeListLazy":{"ListMixin":["Node"],"List":["Node"],"Iterable":["Node"],"ListMixin.E":"Node"},"NodeList":{"ListMixin":["Node"],"ImmutableListMixin":["Node"],"List":["Node"],"JavaScriptIndexingBehavior":["Node"],"Iterable":["Node"],"ImmutableListMixin.E":"Node","ListMixin.E":"Node"},"PluginArray":{"ListMixin":["Plugin"],"ImmutableListMixin":["Plugin"],"List":["Plugin"],"JavaScriptIndexingBehavior":["Plugin"],"Iterable":["Plugin"],"ImmutableListMixin.E":"Plugin","ListMixin.E":"Plugin"},"RtcStatsReport":{"MapMixin":["String","@"],"Map":["String","@"],"MapMixin.K":"String","MapMixin.V":"@"},"SelectElement":{"Element":[],"Node":[],"EventTarget":[]},"SourceBufferList":{"ListMixin":["SourceBuffer"],"ImmutableListMixin":["SourceBuffer"],"List":["SourceBuffer"],"JavaScriptIndexingBehavior":["SourceBuffer"],"EventTarget":[],"Iterable":["SourceBuffer"],"ImmutableListMixin.E":"SourceBuffer","ListMixin.E":"SourceBuffer"},"SpeechGrammarList":{"ListMixin":["SpeechGrammar"],"ImmutableListMixin":["SpeechGrammar"],"List":["SpeechGrammar"],"JavaScriptIndexingBehavior":["SpeechGrammar"],"Iterable":["SpeechGrammar"],"ImmutableListMixin.E":"SpeechGrammar","ListMixin.E":"SpeechGrammar"},"Storage0":{"MapMixin":["String","String"],"Map":["String","String"],"MapMixin.K":"String","MapMixin.V":"String"},"TableElement":{"Element":[],"Node":[],"EventTarget":[]},"TableRowElement":{"Element":[],"Node":[],"EventTarget":[]},"TableSectionElement":{"Element":[],"Node":[],"EventTarget":[]},"TemplateElement":{"Element":[],"Node":[],"EventTarget":[]},"TextTrackCueList":{"ListMixin":["TextTrackCue"],"ImmutableListMixin":["TextTrackCue"],"List":["TextTrackCue"],"JavaScriptIndexingBehavior":["TextTrackCue"],"Iterable":["TextTrackCue"],"ImmutableListMixin.E":"TextTrackCue","ListMixin.E":"TextTrackCue"},"TextTrackList":{"ListMixin":["TextTrack"],"ImmutableListMixin":["TextTrack"],"List":["TextTrack"],"JavaScriptIndexingBehavior":["TextTrack"],"EventTarget":[],"Iterable":["TextTrack"],"ImmutableListMixin.E":"TextTrack","ListMixin.E":"TextTrack"},"TouchList":{"ListMixin":["Touch"],"ImmutableListMixin":["Touch"],"List":["Touch"],"JavaScriptIndexingBehavior":["Touch"],"Iterable":["Touch"],"ImmutableListMixin.E":"Touch","ListMixin.E":"Touch"},"VideoTrackList":{"EventTarget":[]},"_Attr":{"Node":[],"EventTarget":[]},"_CssRuleList":{"ListMixin":["CssRule"],"ImmutableListMixin":["CssRule"],"List":["CssRule"],"JavaScriptIndexingBehavior":["CssRule"],"Iterable":["CssRule"],"ImmutableListMixin.E":"CssRule","ListMixin.E":"CssRule"},"_DomRect":{"Rectangle":["num"]},"_GamepadList":{"ListMixin":["Gamepad?"],"ImmutableListMixin":["Gamepad?"],"List":["Gamepad?"],"JavaScriptIndexingBehavior":["Gamepad?"],"Iterable":["Gamepad?"],"ImmutableListMixin.E":"Gamepad?","ListMixin.E":"Gamepad?"},"_NamedNodeMap":{"ListMixin":["Node"],"ImmutableListMixin":["Node"],"List":["Node"],"JavaScriptIndexingBehavior":["Node"],"Iterable":["Node"],"ImmutableListMixin.E":"Node","ListMixin.E":"Node"},"_SpeechRecognitionResultList":{"ListMixin":["SpeechRecognitionResult"],"ImmutableListMixin":["SpeechRecognitionResult"],"List":["SpeechRecognitionResult"],"JavaScriptIndexingBehavior":["SpeechRecognitionResult"],"Iterable":["SpeechRecognitionResult"],"ImmutableListMixin.E":"SpeechRecognitionResult","ListMixin.E":"SpeechRecognitionResult"},"_StyleSheetList":{"ListMixin":["StyleSheet"],"ImmutableListMixin":["StyleSheet"],"List":["StyleSheet"],"JavaScriptIndexingBehavior":["StyleSheet"],"Iterable":["StyleSheet"],"ImmutableListMixin.E":"StyleSheet","ListMixin.E":"StyleSheet"},"_AttributeMap":{"MapMixin":["String","String"],"Map":["String","String"]},"_ElementAttributeMap":{"MapMixin":["String","String"],"Map":["String","String"],"MapMixin.K":"String","MapMixin.V":"String"},"_EventStream":{"Stream":["1"]},"_ElementEventStreamImpl":{"_EventStream":["1"],"Stream":["1"]},"_EventStreamSubscription":{"StreamSubscription":["1"]},"NodeValidatorBuilder":{"NodeValidator":[]},"_SimpleNodeValidator":{"NodeValidator":[]},"_TemplatingNodeValidator":{"NodeValidator":[]},"_SvgNodeValidator":{"NodeValidator":[]},"FixedSizeListIterator":{"Iterator":["1"]},"_SameOriginUriPolicy":{"UriPolicy":[]},"_ValidatingTreeSanitizer":{"NodeTreeSanitizer":[]},"FilteredElementList":{"ListMixin":["Element"],"List":["Element"],"Iterable":["Element"],"ListMixin.E":"Element"},"LengthList":{"ListMixin":["Length"],"ImmutableListMixin":["Length"],"List":["Length"],"Iterable":["Length"],"ImmutableListMixin.E":"Length","ListMixin.E":"Length"},"NumberList":{"ListMixin":["Number"],"ImmutableListMixin":["Number"],"List":["Number"],"Iterable":["Number"],"ImmutableListMixin.E":"Number","ListMixin.E":"Number"},"ScriptElement0":{"SvgElement":[],"Element":[],"Node":[],"EventTarget":[]},"StringList":{"ListMixin":["String"],"ImmutableListMixin":["String"],"List":["String"],"Iterable":["String"],"ImmutableListMixin.E":"String","ListMixin.E":"String"},"SvgElement":{"Element":[],"Node":[],"EventTarget":[]},"TransformList":{"ListMixin":["Transform"],"ImmutableListMixin":["Transform"],"List":["Transform"],"Iterable":["Transform"],"ImmutableListMixin.E":"Transform","ListMixin.E":"Transform"},"AudioParamMap":{"MapMixin":["String","@"],"Map":["String","@"],"MapMixin.K":"String","MapMixin.V":"@"},"AudioTrackList":{"EventTarget":[]},"BaseAudioContext":{"EventTarget":[]},"OfflineAudioContext":{"EventTarget":[]},"SqlResultSetRowList":{"ListMixin":["Map<@,@>"],"ImmutableListMixin":["Map<@,@>"],"List":["Map<@,@>"],"Iterable":["Map<@,@>"],"ImmutableListMixin.E":"Map<@,@>","ListMixin.E":"Map<@,@>"},"App":{"JsObjectWrapper":["AppJsImpl"],"JsObjectWrapper.T":"AppJsImpl"},"Storage":{"JsObjectWrapper":["StorageJsImpl"],"JsObjectWrapper.T":"StorageJsImpl"},"StorageReference":{"JsObjectWrapper":["ReferenceJsImpl0"],"JsObjectWrapper.T":"ReferenceJsImpl0"},"_FirebaseErrorWrapper":{"FirebaseError":[],"Error":[]},"Uint8List":{"List":["int"],"Iterable":["int"]}}'));
   H._Universe_addErasedTypes(init.typeUniverse, JSON.parse('{"EfficientLengthIterable":1,"UnmodifiableListBase":1,"NativeTypedArray":1,"StreamTransformerBase":2,"ListBase":1,"MapBase":2,"_SetBase":1,"_ListBase_Object_ListMixin":1,"__SetBase_Object_SetMixin":1,"_RectangleBase":1}'));
   0;
   var type$ = (function rtii() {
@@ -11770,6 +11866,7 @@
       _ChildNodeListLazy: findType("_ChildNodeListLazy"),
       _ElementEventStreamImpl_Event: findType("_ElementEventStreamImpl<Event>"),
       _ElementEventStreamImpl_MouseEvent: findType("_ElementEventStreamImpl<MouseEvent>"),
+      _FrozenElementList_Element: findType("_FrozenElementList<Element>"),
       _Future_HttpRequest: findType("_Future<HttpRequest>"),
       _Future_Null: findType("_Future<Null>"),
       _Future_dynamic: findType("_Future<@>"),

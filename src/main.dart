@@ -20,12 +20,25 @@ void main() {
 
       querySelector('.script-play-bar-wrap')?.removeAttribute('style');
     } else {
-      bookScreen?.style.display = 'none';
-      querySelector('.image-wrap')
-        ?..style.width = '2%'
-        ..style.visibility = 'visible';
+      if (window.screen!.width! < 768) {
+        //ちいさく
+        bookScreen?.style.display = 'none';
+        querySelector('.image-wrap')
+          ?..style.height = '2%'
+          ..style.visibility = 'visible';
 
-      querySelector('.script-play-bar-wrap')?.style.width = '78%';
+        //こっちをでかくする
+        querySelector('.script-play-bar-wrap')?.style.height = '60%';
+      } else {
+        //ちいさく
+        bookScreen?.style.display = 'none';
+        querySelector('.image-wrap')
+          ?..style.width = '2%'
+          ..style.visibility = 'visible';
+
+        //こっちをでかくする
+        querySelector('.script-play-bar-wrap')?.style.width = '78%';
+      }
     }
   });
 }
