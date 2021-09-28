@@ -20,7 +20,7 @@ void main() {
 
       querySelector('.script-play-bar-wrap')?.removeAttribute('style');
     } else {
-      if (window.screen!.width! < 768) {
+      if (window.screen!.width! < 640) {
         //ちいさく
         bookScreen?.style.display = 'none';
         querySelector('.image-wrap')

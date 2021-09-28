@@ -11373,7 +11373,7 @@
       } else {
         t3 = window.screen.width;
         t3.toString;
-        if (t3 < 768) {
+        if (t3 < 640) {
           if (!t2) {
             t2 = bookScreen.style;
             t2.display = "none";
